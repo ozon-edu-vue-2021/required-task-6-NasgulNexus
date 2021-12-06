@@ -1,5 +1,12 @@
 <template>
   <div class="Table">
+    <b-icon
+      v-show="infinity_scroll===true"
+      class="back_to_top"
+      icon="chevron-up"
+      font-scale="2"
+      @click="scrollToTop"
+    />
     <div class="Table__header_filter">
       <div class="group">
         <input v-model="search" type="text" required />
@@ -74,7 +81,7 @@ export default {
             tablesPerPage:10,
             pageNumber:1,
             infinity_scroll: false,
-            search: ''
+            search: '',
         }
     },
     computed:{
@@ -110,7 +117,10 @@ export default {
         },
         Table__infinity_scroll_false(){
             this.infinity_scroll=false;
-        }   
+        },
+         scrollToTop() {
+                window.scrollTo(0,0);
+           }   
     }
 }
 </script>
@@ -223,6 +233,12 @@ input:focus ~ .bar:after {
   border: solid 0px #e7e7e7;
   border-radius: 2px;
   background: #ffffff;
+  cursor: pointer;
+}
+.back_to_top {
+  position: fixed;
+  bottom: 80px;
+  right: 40px;
   cursor: pointer;
 }
 </style>
