@@ -8,10 +8,25 @@
       @click="scrollToTop"
     />
     <div class="Table__header_filter">
-      <div class="group">
+      <div v-show="selected=='1'" class="group">
         <input v-model="search" type="text" required />
         <span class="bar"></span>
         <label>Поиск</label>
+      </div>
+      <div v-show="selected=='2'" class="group">
+        <input v-model="searchName" type="text" required />
+        <span class="bar"></span>
+        <label>Поиск по name</label>
+      </div>
+      <div v-show="selected=='3'" class="group">
+        <input v-model="searchBody" type="text" required />
+        <span class="bar"></span>
+        <label>Поиск по body</label>
+      </div>
+      <div v-show="selected=='4'" class="group">
+        <input v-model="searchEmail" type="text" required />
+        <span class="bar"></span>
+        <label>Поиск по email</label>
       </div>
       <button
         v-show="infinity_scroll===false"
@@ -23,28 +38,51 @@
         class="Table__button"
         @click="Table__infinity_scroll_false"
       >Пагинация</button>
+      <select v-model="selected" class="Table_select">
+        <option value="1">Общая фильтрация</option>
+        <option value="2">Фильтрация по name</option>
+        <option value="3">Фильтрация по body</option>
+        <option value="4">Фильтрация по email</option>
+      </select>
     </div>
     <div class="Table__header">
-      <p @click="sortByName">
+      <p>
         name
-        <b-icon icon="arrow-down-up" />
+        <b-icon icon="sort-alpha-up" class="b-icon" @click="sortByNameTop" />
+        <b-icon icon="sort-alpha-up-alt" class="b-icon" @click="sortByNameBot" />
       </p>
-      <p @click="sortByBody">
+      <p>
         body
-        <b-icon icon="arrow-down-up" />
+        <b-icon icon="sort-alpha-up" class="b-icon" @click="sortByBodyTop" />
+        <b-icon icon="sort-alpha-up-alt" class="b-icon" @click="sortByBodyBot" />
       </p>
-      <p @click="sortByEmail">
+      <p>
         email
-        <b-icon icon="arrow-down-up" />
+        <b-icon icon="sort-alpha-up" class="b-icon" @click="sortByEmailTop" />
+        <b-icon icon="sort-alpha-up-alt" class="b-icon" @click="sortByEmailBot" />
       </p>
     </div>
     <div v-show="search!==''" class="Table__body">
       <TableRow v-for="row in filtred" :key="row.id" :row_data="row" />
     </div>
-    <div v-show="infinity_scroll===true && search===''" class="Table__body">
+    <div v-show="searchName!==''" class="Table__body">
+      <TableRow v-for="row in filtredName" :key="row.id" :row_data="row" />
+    </div>
+    <div v-show="searchBody!==''" class="Table__body">
+      <TableRow v-for="row in filtredBody" :key="row.id" :row_data="row" />
+    </div>
+    <div v-show="searchEmail!==''" class="Table__body">
+      <TableRow v-for="row in filtredEmail" :key="row.id" :row_data="row" />
+    </div>
+    <div
+      v-show="infinity_scroll===true && search==='' && searchName==='' && searchEmail==='' && searchBody===''"
+      class="Table__body"
+    >
       <TableRow v-for="row in tables_data" :key="row.id" :row_data="row" />
     </div>
-    <div v-show="search==='' && infinity_scroll===false">
+    <div
+      v-show="search==='' && searchName==='' && searchEmail==='' && searchBody==='' && infinity_scroll===false"
+    >
       <div class="Table__body">
         <TableRow v-for="row in paginationTabels" :key="row.id" :row_data="row" />
       </div>
@@ -82,6 +120,10 @@ export default {
             pageNumber:1,
             infinity_scroll: false,
             search: '',
+            searchName: '',
+            searchBody: '',
+            searchEmail: '',
+            selected: '1'
         }
     },
     computed:{
@@ -97,20 +139,44 @@ export default {
             return this.tables_data.filter((table)=>{
                 return table.name.indexOf(this.search) > -1 || table.body.indexOf(this.search) > -1 || table.email.indexOf(this.search) > -1
             })
+        },
+         filtredName(){
+            return this.tables_data.filter((table)=>{
+                return table.name.indexOf(this.searchName) > -1 
+            })
+        },
+         filtredBody(){
+            return this.tables_data.filter((table)=>{
+                return table.body.indexOf(this.searchBody) > -1
+            })
+        },
+         filtredEmail(){
+            return this.tables_data.filter((table)=>{
+                return table.email.indexOf(this.searchEmail) > -1
+            })
         }
     },
     methods: {
         pageClick(page){
             this.pageNumber = page;
         },
-        sortByName(){
+        sortByNameTop(){
             this.tables_data.sort((a,b)=>a.name.localeCompare(b.name))
         },
-        sortByBody(){
+        sortByNameBot(){
+            this.tables_data.sort((a,b)=>b.name.localeCompare(a.name))
+        },
+        sortByBodyTop(){
              this.tables_data.sort((a,b)=>a.body.localeCompare(b.body))
         },
-        sortByEmail(){
+        sortByBodyBot(){
+             this.tables_data.sort((a,b)=>b.body.localeCompare(a.body))
+        },
+        sortByEmailTop(){
             this.tables_data.sort((a,b)=>a.email.localeCompare(b.email))
+        },
+         sortByEmailBot(){
+            this.tables_data.sort((a,b)=>b.email.localeCompare(a.email))
         },
         Table__infinity_scroll_true(){
             this.infinity_scroll=true;
@@ -119,8 +185,8 @@ export default {
             this.infinity_scroll=false;
         },
          scrollToTop() {
-                window.scrollTo(0,0);
-           }   
+            window.scrollTo(0,0);
+        }
     }
 }
 </script>
@@ -222,7 +288,6 @@ input:valid ~ label {
 .bar:after {
   right: 50%;
 }
-
 input:focus ~ .bar:before,
 input:focus ~ .bar:after {
   width: 50%;
@@ -239,6 +304,18 @@ input:focus ~ .bar:after {
   position: fixed;
   bottom: 80px;
   right: 40px;
+  cursor: pointer;
+}
+.b-icon {
+  margin-left: 10px;
+}
+.Table_select {
+  margin-left: 70px;
+  padding: 5px;
+  font-size: 18px;
+  border: solid 0px #e7e7e7;
+  border-radius: 2px;
+  background: #ffffff;
   cursor: pointer;
 }
 </style>

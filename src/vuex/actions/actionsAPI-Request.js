@@ -1,5 +1,4 @@
 import axios from "axios";
-export const GET_DATA_TABLES_FROM_API = "getDataTablesFromAPI";
 
 export default {
   GET_DATA_TABLES_FROM_API({ commit }) {

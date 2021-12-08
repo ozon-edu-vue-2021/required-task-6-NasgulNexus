@@ -17,7 +17,6 @@ export default {
   },
   methods:{
     ...mapActions(['GET_DATA_TABLES_FROM_API'])
-   
   },
   mounted(){
     this.GET_DATA_TABLES_FROM_API()
